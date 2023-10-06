@@ -65,7 +65,7 @@ holo_abs = holo_abs / np.amax( holo_abs )
 
 holo_comb = np.arctan2( holo_spot_sum.imag, holo_spot_sum.real )
 
-holo_comb = holo_comb #* holo_abs
+holo_comb = holo_comb * holo_abs
 
 
 # Calculate Fourier transform of grating
