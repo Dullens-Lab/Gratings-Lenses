@@ -82,3 +82,5 @@ plt.imshow( holo_abs, interpolation = 'none', cmap='gray' ), plt.colorbar()
 plt.imshow( ft, interpolation = 'none', cmap='gray' ), plt.colorbar()
 plt.show()
 
+print("hello")
+
