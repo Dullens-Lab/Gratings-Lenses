@@ -17,6 +17,8 @@ pi = np.pi
 # SLM dimensions in pixels
 px_x = 512
 px_y = 512
+cen_x = 0.5
+cen_y = 0.5
 
 wave = 1064e-9      # incident wavelength
 f    = 200e-3       # focal length of fourier lens
@@ -30,29 +32,31 @@ const_lens    = pi * M_z * um / ( f ** 2 * wave )
 
 
 ##### spots[ x, y, z, vortex, intensity ] #####
-spots = [ [ .1, .1, 0, 0, 1 ], [ -.1, .1, 0, 0, 1 ] ]
+d = 0.4
+spots = [ [ d, d, 0, 0, 1 ], [ -d, d, 0, 0, 1 ] ]
 
 
 ##### init holograms #####
 holo_grating = init_holo()
 holo_lens    = init_holo()
 holo_vortex  = init_holo()
-
 holo_sum     = init_holo()
 holo_mod     = init_holo() + 1j
 
 
 ##### calculate holograms #####
-for x in range( px_x ) : 
- for y in range( px_y ) : 
+for p in range( px_x ) :
+ x = p - ( px_x * cen_x )
+ for n in range( px_y ) :
+  y = n - ( px_y * cen_y )
   for s in range( len( spots ) ) :
-   holo_grating[ y, x, s ]	= ( spots[ s ][ 0 ] * x + spots[ s ][ 1 ] * y ) * const_grating % ( 2 * pi )
-   holo_lens[ y, x, s ]		= spots[ s ][ 2 ] * ( x ** 2 + y ** 2 ) * const_lens % ( 2 * pi )
-   #holo_vortex[ y, x, s ] = np.cos( spots[ s ][ 3 ] * ( np.arctan( y / ( x + 1 ) ) - x ) )
+   holo_grating[ n, p, s ]	= ( spots[ s ][ 0 ] * x + spots[ s ][ 1 ] * y ) * const_grating % ( 2 * pi )
+   holo_lens[ n, p, s ]		= spots[ s ][ 2 ] * ( x ** 2 + y ** 2 ) * const_lens % ( 2 * pi )
+   holo_vortex[ n, p, s ]  = - spots[ s ][ 3 ] * np.arctan2( y , x ) % ( 2 * pi )
 
 # sum holograms for single spot with all spot params applied
 for s in range( len( spots ) ) :
- holo_sum[ :, :, s ] = ( holo_grating[ :, :, s ] + holo_lens[ :, :, s ] + holo_vortex[ :, :, s ] ) % ( 2 * pi )
+ holo_sum[ :, :, s ] = ( holo_grating[ :, :, s ] + holo_lens[ :, :, s ] + holo_vortex[ :, :, s ] ) 
 
 # combine holograms for multiple spots
 for s in range( len( spots ) ) :
@@ -74,10 +78,14 @@ ft = np.fft.fft2(ft)
 ft = np.fft.fftshift(ft)
 ft = abs( ft )
 
-
+prof = ft[ : , 244 ]
+plt.plot(prof)
+plt.xlim([206, 306])
 ##### plot #####
-#plt.subplot(1, 2, 1)
-plt.imshow( holo_abs, interpolation = 'none', cmap='gray' ), plt.colorbar()
-#plt.subplot(1, 2, 2)
-plt.imshow( ft, interpolation = 'none', cmap='gray' ), plt.colorbar()
+# plt.subplot(1, 2, 1)
+# plt.imshow( holo_comb, interpolation = 'none', cmap='gray' )#, plt.colorbar()
+# plt.subplot(1, 2, 2)
+# plt.imshow( ft, interpolation = 'none', cmap='gray' )#, plt.colorbar()
+# plt.xlim([206, 306])
+# plt.ylim([306, 206])
 plt.show()
