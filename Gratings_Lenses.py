@@ -72,20 +72,23 @@ holo_comb = np.arctan2( holo_spot_sum.imag, holo_spot_sum.real )
 holo_comb = holo_comb * holo_abs
 
 
+
 # Calculate Fourier transform of grating
 ft = np.fft.ifftshift( holo_comb )
 ft = np.fft.fft2(ft)
 ft = np.fft.fftshift(ft)
 ft = abs( ft )
 
-prof = ft[ : , 244 ]
-plt.plot(prof)
-plt.xlim([206, 306])
+print( np.sum( ft))
 ##### plot #####
-# plt.subplot(1, 2, 1)
-# plt.imshow( holo_comb, interpolation = 'none', cmap='gray' )#, plt.colorbar()
-# plt.subplot(1, 2, 2)
-# plt.imshow( ft, interpolation = 'none', cmap='gray' )#, plt.colorbar()
-# plt.xlim([206, 306])
-# plt.ylim([306, 206])
+plt.subplot(2, 2, 1)
+plt.imshow( holo_abs, interpolation = 'none', cmap='gray' )#, plt.colorbar()
+plt.subplot(2, 2, 2)
+plt.imshow( ft, interpolation = 'none', cmap='gray' )#, plt.colorbar()
+plt.xlim([206, 306])
+plt.ylim([306, 206])
+plt.subplot(2,2,3)
+plt.plot( ft[245,:])
+plt.xlim([206, 306])
 plt.show()
+ 
